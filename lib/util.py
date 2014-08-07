@@ -76,9 +76,9 @@ def assets_to_asset_pair(asset1, asset2):
     elif asset1 == config.XCP  or asset2 == config.XCP :
         base = asset2 if asset1 == config.XCP else asset1
         quote = asset1 if asset1 == config.XCP else asset2
-    elif asset1 == 'XBTC'  or asset2 == 'XBTC' :
-        base = asset2 if asset1 == 'XBTC' else asset1
-        quote = asset1 if asset1 == 'XBTC' else asset2
+    elif asset1 == 'XVIA'  or asset2 == 'XVIA' :
+        base = asset2 if asset1 == 'XVIA' else asset1
+        quote = asset1 if asset1 == 'XVIA' else asset2
     else:
         base = asset1 if asset1 < asset2 else asset2
         quote = asset2 if asset1 < asset2 else asset1

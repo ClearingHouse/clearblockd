@@ -166,10 +166,10 @@ def process_cpd_blockfeed(zmq_publisher_eventfeed):
         or app_config[0]['db_version'] != config.DB_VERSION
         or app_config[0]['running_testnet'] != config.TESTNET):
         if app_config.count():
-            logging.warn("counterblockd database version UPDATED (from %i to %i) or testnet setting changed (from %s to %s), or REINIT forced (%s). REBUILDING FROM SCRATCH ..." % (
+            logging.warn("clearblockd database version UPDATED (from %i to %i) or testnet setting changed (from %s to %s), or REINIT forced (%s). REBUILDING FROM SCRATCH ..." % (
                 app_config[0]['db_version'], config.DB_VERSION, app_config[0]['running_testnet'], config.TESTNET, config.REPARSE_FORCED))
         else:
-            logging.warn("counterblockd database app_config collection doesn't exist. BUILDING FROM SCRATCH...")
+            logging.warn("clearblockd database app_config collection doesn't exist. BUILDING FROM SCRATCH...")
         app_config = blow_away_db()
         my_latest_block = LATEST_BLOCK_INIT
     else:
@@ -185,7 +185,7 @@ def process_cpd_blockfeed(zmq_publisher_eventfeed):
         try:
             running_info = util.call_jsonrpc_api("get_running_info", abort_on_error=True)
             if 'result' not in running_info:
-                raise AssertionError("Could not contact counterpartyd")
+                raise AssertionError("Could not contact clearinghoused")
             running_info = running_info['result']
         except Exception, e:
             logging.warn(str(e) + " -- Waiting 3 seconds before trying again...")
@@ -193,7 +193,7 @@ def process_cpd_blockfeed(zmq_publisher_eventfeed):
             continue
         
         if running_info['last_message_index'] == -1: #last_message_index not set yet (due to no messages in counterpartyd DB yet)
-            logging.warn("No last_message_index returned. Waiting until counterpartyd has messages...")
+            logging.warn("No last_message_index returned. Waiting until clearinghoused has messages...")
             time.sleep(10)
             continue
         
@@ -205,18 +205,18 @@ def process_cpd_blockfeed(zmq_publisher_eventfeed):
            or app_config['counterpartyd_running_testnet'] is None:
             updatePrefs = True
         elif running_info['version_major'] != app_config['counterpartyd_db_version_major']:
-            logging.warn("counterpartyd MAJOR DB version change (we built from %s, counterpartyd is at %s). Wiping our state data." % (
+            logging.warn("clearinghoused MAJOR DB version change (we built from %s, clearinghoused is at %s). Wiping our state data." % (
                 app_config['counterpartyd_db_version_major'], running_info['version_major']))
             wipeState = True
             updatePrefs = True
         elif running_info['version_minor'] != app_config['counterpartyd_db_version_minor']:
-            logging.warn("counterpartyd MINOR DB version change (we built from %s.%s, counterpartyd is at %s.%s). Wiping our state data." % (
+            logging.warn("clearinghoused MINOR DB version change (we built from %s.%s, clearinghoused is at %s.%s). Wiping our state data." % (
                 app_config['counterpartyd_db_version_major'], app_config['counterpartyd_db_version_minor'],
                 running_info['version_major'], running_info['version_minor']))
             wipeState = True
             updatePrefs = True
         elif running_info.get('running_testnet', False) != app_config['counterpartyd_running_testnet']:
-            logging.warn("counterpartyd testnet setting change (from %s to %s). Wiping our state data." % (
+            logging.warn("clearinghoused testnet setting change (from %s to %s). Wiping our state data." % (
                 app_config['counterpartyd_running_testnet'], running_info['running_testnet']))
             wipeState = True
             updatePrefs = True
@@ -236,7 +236,7 @@ def process_cpd_blockfeed(zmq_publisher_eventfeed):
         last_processed_block = running_info['last_block']
         
         if last_processed_block['block_index'] is None:
-            logging.warn("counterpartyd has no last processed block (probably is reparsing). Waiting 3 seconds before trying again...")
+            logging.warn("clearinghoused has no last processed block (probably is reparsing). Waiting 3 seconds before trying again...")
             time.sleep(3)
             continue
         

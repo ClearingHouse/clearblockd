@@ -1564,16 +1564,16 @@ def serve_api(mongo_db, redis_client):
             response_code = 500
         
         result = {
-            'counterpartyd': 'OK' if cpd_result_valid else 'NOT OK',
-            'counterblockd': 'OK' if cbd_result_valid else 'NOT OK',
-            'counterblockd_error': cbd_result_error_code,
-            'counterpartyd_ver': '%s.%s.%s' % (
+            'clearinghoused': 'OK' if cpd_result_valid else 'NOT OK',
+            'clearblockd': 'OK' if cbd_result_valid else 'NOT OK',
+            'clearblockd_error': cbd_result_error_code,
+            'clearinghoused_ver': '%s.%s.%s' % (
                 cpd_status['version_major'], cpd_status['version_minor'], cpd_status['version_revision']) if cpd_result_valid else '?',
-            'counterblockd_ver': config.VERSION,
-            'counterpartyd_last_block': cpd_status['last_block'] if cpd_result_valid else '?',
-            'counterpartyd_last_message_index': cpd_status['last_message_index'] if cpd_result_valid else '?',
-            'counterpartyd_check_elapsed': cpd_e - cpd_s,
-            'counterblockd_check_elapsed': cbd_e - cbd_s,
+            'clearblockd_ver': config.VERSION,
+            'clearinghoused_last_block': cpd_status['last_block'] if cpd_result_valid else '?',
+            'clearinghoused_last_message_index': cpd_status['last_message_index'] if cpd_result_valid else '?',
+            'clearinghoused_check_elapsed': cpd_e - cpd_s,
+            'clearblockd_check_elapsed': cbd_e - cbd_s,
             'local_online_users': len(siofeeds.onlineClients),
         }
         return flask.Response(json.dumps(result), response_code, mimetype='application/json')

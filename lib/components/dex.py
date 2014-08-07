@@ -50,7 +50,7 @@ def get_pairs_with_orders(addresses=[], max_pairs=12):
             'quote_asset': quote_asset,
             'my_order_count': my_pair['order_count']
         }
-        if my_pair['pair'] == 'BTC/XCP': # XCP/BTC always in first
+        if my_pair['pair'] == 'VIA/XCH': # XCP/BTC always in first
             pairs_with_orders.insert(0, top_pair)
         else:
             pairs_with_orders.append(top_pair)
@@ -159,10 +159,10 @@ def get_users_pairs(addresses=[], max_pairs=12):
 
     if 'XCP/BTC' not in [p['base_asset'] + '/' + p['quote_asset'] for p in top_pairs]:
         top_pairs.insert(0, {
-            'base_asset': 'XCP',
-            'quote_asset': 'BTC'
+            'base_asset': 'XCH',
+            'quote_asset': 'VIA'
         })
-        all_assets += ['XCP', 'BTC']
+        all_assets += ['XCH', 'VIA']
 
     top_pairs = top_pairs[:12]
     all_assets = list(set(all_assets))
@@ -206,7 +206,7 @@ def get_market_orders(asset1, asset2, addresses=[], supplies=None, min_fee_provi
         user_order = {}
 
         exclude = False
-        if order['give_asset'] == 'BTC':
+        if order['give_asset'] == 'VIA':
             try:
                 fee_provided = order['fee_provided'] / (order['give_quantity'] / 100)
                 user_order['fee_provided'] = format(D(order['fee_provided']) / (D(order['give_quantity']) / D(100)), '.2f') 
@@ -215,7 +215,7 @@ def get_market_orders(asset1, asset2, addresses=[], supplies=None, min_fee_provi
 
             exclude = fee_provided < min_fee_provided
 
-        elif order['get_asset'] == 'BTC':
+        elif order['get_asset'] == 'VIA':
             try:
                 fee_required = order['fee_required'] / (order['get_quantity'] / 100)
                 user_order['fee_required'] = format(D(order['fee_required']) / (D(order['get_quantity']) / D(100)), '.2f')
@@ -334,13 +334,13 @@ def get_assets_supply(assets=[]):
 
     supplies = {}
 
-    if 'XCP' in assets:
-        supplies['XCP'] = (util.call_jsonrpc_api('get_xcp_supply', [])['result'], True)
-        assets.remove('XCP')
+    if 'XCH' in assets:
+        supplies['XCH'] = (util.call_jsonrpc_api('get_xcp_supply', [])['result'], True)
+        assets.remove('XCH')
 
-    if 'BTC' in assets:
-        supplies['BTC'] = (0, True)
-        assets.remove('BTC')
+    if 'VIA' in assets:
+        supplies['VIA'] = (0, True)
+        assets.remove('VIA')
 
     if len(assets) > 0:
         sql = '''SELECT asset, SUM(quantity) AS supply, divisible FROM issuances 

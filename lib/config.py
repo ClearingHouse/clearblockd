@@ -20,8 +20,8 @@ ORDER_BTC_DUST_LIMIT_CUTOFF = MULTISIG_DUST_SIZE
 
 mongo_db = None #will be set on server init
 
-BTC = 'BTC'
-XCP = 'XCP'
+BTC = 'VIA'
+XCP = 'XCH'
 
 MAX_REORG_NUM_BLOCKS = 10 #max reorg we'd likely ever see
 

@@ -1,5 +1,5 @@
 '''
-http://insight.bitpay.com/
+http://explorer.viacoin.org/
 '''
 import logging
 

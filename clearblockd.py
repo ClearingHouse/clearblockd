@@ -33,12 +33,12 @@ from lib import (config, api, events, blockfeed, siofeeds, util)
 
 if __name__ == '__main__':
     # Parse command-line arguments.
-    parser = argparse.ArgumentParser(prog='counterblockd', description='Counterwallet daemon. Works with counterpartyd')
-    parser.add_argument('-V', '--version', action='version', version="counterblockd v%s" % config.VERSION)
+    parser = argparse.ArgumentParser(prog='clearinghoused', description='Clearwallet daemon. Works with clearinghoused')
+    parser.add_argument('-V', '--version', action='version', version="cleablockd v%s" % config.VERSION)
     parser.add_argument('-v', '--verbose', dest='verbose', action='store_true', default=False, help='sets log level to DEBUG instead of WARNING')
 
-    parser.add_argument('--reparse', action='store_true', default=False, help='force full re-initialization of the counterblockd database')
-    parser.add_argument('--testnet', action='store_true', default=False, help='use Bitcoin testnet addresses and block numbers')
+    parser.add_argument('--reparse', action='store_true', default=False, help='force full re-initialization of the clearblockd database')
+    parser.add_argument('--testnet', action='store_true', default=False, help='use Viacoin testnet addresses and block numbers')
     parser.add_argument('--data-dir', help='specify to explicitly override the directory in which to keep the config file and log file')
     parser.add_argument('--config-file', help='the location of the configuration file')
     parser.add_argument('--log-file', help='the location of the log file')
@@ -46,10 +46,10 @@ if __name__ == '__main__':
     parser.add_argument('--pid-file', help='the location of the pid file')
 
     #THINGS WE CONNECT TO
-    parser.add_argument('--counterpartyd-rpc-connect', help='the hostname of the counterpartyd JSON-RPC server')
-    parser.add_argument('--counterpartyd-rpc-port', type=int, help='the port used to communicate with counterpartyd over JSON-RPC')
-    parser.add_argument('--counterpartyd-rpc-user', help='the username used to communicate with counterpartyd over JSON-RPC')
-    parser.add_argument('--counterpartyd-rpc-password', help='the password used to communicate with counterpartyd over JSON-RPC')
+    parser.add_argument('--clearinghoused-rpc-connect', help='the hostname of the clearinghoused JSON-RPC server')
+    parser.add_argument('--clearinghoused-rpc-port', type=int, help='the port used to communicate with clearinghoused over JSON-RPC')
+    parser.add_argument('--clearinghoused-rpc-user', help='the username used to communicate with clearinghoused over JSON-RPC')
+    parser.add_argument('--clearinghoused-rpc-password', help='the password used to communicate with clearinghoused over JSON-RPC')
 
     parser.add_argument('--blockchain-service-name', help='the blockchain service name to connect to')
     parser.add_argument('--blockchain-service-connect', help='the blockchain service server URL base to connect to, if not default')
@@ -69,12 +69,12 @@ if __name__ == '__main__':
 
     #THINGS WE HOST
     parser.add_argument('--rpc-host', help='the IP of the interface to bind to for providing JSON-RPC API access (0.0.0.0 for all interfaces)')
-    parser.add_argument('--rpc-port', type=int, help='port on which to provide the counterblockd JSON-RPC API')
+    parser.add_argument('--rpc-port', type=int, help='port on which to provide the clearblockd JSON-RPC API')
     parser.add_argument('--rpc-allow-cors', action='store_true', default=True, help='Allow ajax cross domain request')
-    parser.add_argument('--socketio-host', help='the interface on which to host the counterblockd socket.io API')
-    parser.add_argument('--socketio-port', type=int, help='port on which to provide the counterblockd socket.io API')
-    parser.add_argument('--socketio-chat-host', help='the interface on which to host the counterblockd socket.io chat API')
-    parser.add_argument('--socketio-chat-port', type=int, help='port on which to provide the counterblockd socket.io chat API')
+    parser.add_argument('--socketio-host', help='the interface on which to host the clearblockd socket.io API')
+    parser.add_argument('--socketio-port', type=int, help='port on which to provide the clearblockd socket.io API')
+    parser.add_argument('--socketio-chat-host', help='the interface on which to host the clearblockd socket.io chat API')
+    parser.add_argument('--socketio-chat-port', type=int, help='port on which to provide the clearblockd socket.io chat API')
 
     parser.add_argument('--rollbar-token', help='the API token to use with rollbar (leave blank to disable rollbar integration)')
     parser.add_argument('--rollbar-env', help='the environment name for the rollbar integration (if enabled). Defaults to \'production\'')
@@ -86,14 +86,14 @@ if __name__ == '__main__':
 
     # Data directory
     if not args.data_dir:
-        config.DATA_DIR = appdirs.user_data_dir(appauthor='Counterparty', appname='counterblockd', roaming=True)
+        config.DATA_DIR = appdirs.user_data_dir(appauthor='ClearingHouse', appname='clearblockd', roaming=True)
     else:
         config.DATA_DIR = args.data_dir
     if not os.path.isdir(config.DATA_DIR): os.mkdir(config.DATA_DIR)
 
     #Read config file
     configfile = ConfigParser.ConfigParser()
-    config_path = os.path.join(config.DATA_DIR, 'counterblockd.conf')
+    config_path = os.path.join(config.DATA_DIR, 'clearblockd.conf')
     configfile.read(config_path)
     has_config = configfile.has_section('Default')
 
@@ -104,26 +104,26 @@ if __name__ == '__main__':
         config.TESTNET = configfile.getboolean('Default', 'testnet')
     else:
         config.TESTNET = False
-        
+
     # reparse
     config.REPARSE_FORCED = args.reparse
-        
+
     ##############
     # THINGS WE CONNECT TO
 
     # counterpartyd RPC host
     if args.counterpartyd_rpc_connect:
         config.COUNTERPARTYD_RPC_CONNECT = args.counterpartyd_rpc_connect
-    elif has_config and configfile.has_option('Default', 'counterpartyd-rpc-connect') and configfile.get('Default', 'counterpartyd-rpc-connect'):
-        config.COUNTERPARTYD_RPC_CONNECT = configfile.get('Default', 'counterpartyd-rpc-connect')
+    elif has_config and configfile.has_option('Default', 'clearinghoused-rpc-connect') and configfile.get('Default', 'clearinghoused-rpc-connect'):
+        config.COUNTERPARTYD_RPC_CONNECT = configfile.get('Default', 'clearinghoused-rpc-connect')
     else:
         config.COUNTERPARTYD_RPC_CONNECT = 'localhost'
 
     # counterpartyd RPC port
     if args.counterpartyd_rpc_port:
         config.COUNTERPARTYD_RPC_PORT = args.counterpartyd_rpc_port
-    elif has_config and configfile.has_option('Default', 'counterpartyd-rpc-port') and configfile.get('Default', 'counterpartyd-rpc-port'):
-        config.COUNTERPARTYD_RPC_PORT = configfile.get('Default', 'counterpartyd-rpc-port')
+    elif has_config and configfile.has_option('Default', 'clearinghoused-rpc-port') and configfile.get('Default', 'clearinghoused-rpc-port'):
+        config.COUNTERPARTYD_RPC_PORT = configfile.get('Default', 'clearinghoused-rpc-port')
     else:
         if config.TESTNET:
             config.COUNTERPARTYD_RPC_PORT = 14000
@@ -133,21 +133,21 @@ if __name__ == '__main__':
         config.COUNTERPARTYD_RPC_PORT = int(config.COUNTERPARTYD_RPC_PORT)
         assert int(config.COUNTERPARTYD_RPC_PORT) > 1 and int(config.COUNTERPARTYD_RPC_PORT) < 65535
     except:
-        raise Exception("Please specific a valid port number counterpartyd-rpc-port configuration parameter")
-            
+        raise Exception("Please specific a valid port number clearinghoused-rpc-port configuration parameter")
+
     # counterpartyd RPC user
     if args.counterpartyd_rpc_user:
         config.COUNTERPARTYD_RPC_USER = args.counterpartyd_rpc_user
-    elif has_config and configfile.has_option('Default', 'counterpartyd-rpc-user') and configfile.get('Default', 'counterpartyd-rpc-user'):
-        config.COUNTERPARTYD_RPC_USER = configfile.get('Default', 'counterpartyd-rpc-user')
+    elif has_config and configfile.has_option('Default', 'clearinghoused-rpc-user') and configfile.get('Default', 'clearinghoused-rpc-user'):
+        config.COUNTERPARTYD_RPC_USER = configfile.get('Default', 'clearinghoused-rpc-user')
     else:
         config.COUNTERPARTYD_RPC_USER = 'rpcuser'
 
     # counterpartyd RPC password
     if args.counterpartyd_rpc_password:
         config.COUNTERPARTYD_RPC_PASSWORD = args.counterpartyd_rpc_password
-    elif has_config and configfile.has_option('Default', 'counterpartyd-rpc-password') and configfile.get('Default', 'counterpartyd-rpc-password'):
-        config.COUNTERPARTYD_RPC_PASSWORD = configfile.get('Default', 'counterpartyd-rpc-password')
+    elif has_config and configfile.has_option('Default', 'clearinghoused-rpc-password') and configfile.get('Default', 'clearinghoused-rpc-password'):
+        config.COUNTERPARTYD_RPC_PASSWORD = configfile.get('Default', 'clearinghoused-rpc-password')
     else:
         config.COUNTERPARTYD_RPC_PASSWORD = 'rpcpassword'
 
@@ -191,7 +191,7 @@ if __name__ == '__main__':
         assert int(config.MONGODB_PORT) > 1 and int(config.MONGODB_PORT) < 65535
     except:
         raise Exception("Please specific a valid port number mongodb-port configuration parameter")
-            
+
     # mongodb database
     if args.mongodb_database:
         config.MONGODB_DATABASE = args.mongodb_database
@@ -275,7 +275,7 @@ if __name__ == '__main__':
 
     ##############
     # THINGS WE SERVE
-    
+
     # RPC host
     if args.rpc_host:
         config.RPC_HOST = args.rpc_host
@@ -293,7 +293,7 @@ if __name__ == '__main__':
         if config.TESTNET:
             config.RPC_PORT = 14100
         else:
-            config.RPC_PORT = 4100        
+            config.RPC_PORT = 4100
     try:
         config.RPC_PORT = int(config.RPC_PORT)
         assert int(config.RPC_PORT) > 1 and int(config.RPC_PORT) < 65535
@@ -325,7 +325,7 @@ if __name__ == '__main__':
         if config.TESTNET:
             config.SOCKETIO_PORT = 14101
         else:
-            config.SOCKETIO_PORT = 4101        
+            config.SOCKETIO_PORT = 4101
     try:
         config.SOCKETIO_PORT = int(config.SOCKETIO_PORT)
         assert int(config.SOCKETIO_PORT) > 1 and int(config.SOCKETIO_PORT) < 65535
@@ -349,7 +349,7 @@ if __name__ == '__main__':
         if config.TESTNET:
             config.SOCKETIO_CHAT_PORT = 14102
         else:
-            config.SOCKETIO_CHAT_PORT = 4102       
+            config.SOCKETIO_CHAT_PORT = 4102
     try:
         config.SOCKETIO_CHAT_PORT = int(config.SOCKETIO_CHAT_PORT)
         assert int(config.SOCKETIO_CHAT_PORT) > 1 and int(config.SOCKETIO_CHAT_PORT) < 65535
@@ -372,15 +372,15 @@ if __name__ == '__main__':
     elif has_config and configfile.has_option('Default', 'log-file'):
         config.LOG = configfile.get('Default', 'log-file')
     else:
-        config.LOG = os.path.join(config.DATA_DIR, 'counterblockd.log')
-        
+        config.LOG = os.path.join(config.DATA_DIR, 'clearblockd.log')
+
     if args.tx_log_file:
         config.TX_LOG = args.tx_log_file
     elif has_config and configfile.has_option('Default', 'tx-log-file'):
         config.TX_LOG = configfile.get('Default', 'tx-log-file')
     else:
-        config.TX_LOG = os.path.join(config.DATA_DIR, 'counterblockd-tx.log')
-    
+        config.TX_LOG = os.path.join(config.DATA_DIR, 'clearblockd-tx.log')
+
 
     # PID
     if args.pid_file:
@@ -388,7 +388,7 @@ if __name__ == '__main__':
     elif has_config and configfile.has_option('Default', 'pid-file'):
         config.PID = configfile.get('Default', 'pid-file')
     else:
-        config.PID = os.path.join(config.DATA_DIR, 'counterblockd.pid')
+        config.PID = os.path.join(config.DATA_DIR, 'clearblockd.pid')
 
      # ROLLBAR INTEGRATION
     if args.rollbar_token:
@@ -403,8 +403,8 @@ if __name__ == '__main__':
     elif has_config and configfile.has_option('Default', 'rollbar-env'):
         config.ROLLBAR_ENV = configfile.get('Default', 'rollbar-env')
     else:
-        config.ROLLBAR_ENV = 'counterblockd-production'
-        
+        config.ROLLBAR_ENV = 'clearblockd-production'
+
     #support email
     if args.support_email:
         config.SUPPORT_EMAIL = args.support_email
@@ -435,18 +435,18 @@ if __name__ == '__main__':
     pid = str(os.getpid())
     pidf = open(config.PID, 'w')
     pidf.write(pid)
-    pidf.close()    
+    pidf.close()
 
     # Logging (to file and console).
     MAX_LOG_SIZE = 20 * 1024 * 1024 #max log size of 20 MB before rotation (make configurable later)
     MAX_LOG_COUNT = 5
     logger = logging.getLogger() #get root logger
     logger.setLevel(logging.DEBUG if args.verbose else logging.INFO)
-    
+
     #Color logging on console for warnings and errors
     logging.addLevelName( logging.WARNING, "\033[1;31m%s\033[1;0m" % logging.getLevelName(logging.WARNING))
     logging.addLevelName( logging.ERROR, "\033[1;41m%s\033[1;0m" % logging.getLevelName(logging.ERROR))
-    
+
     #Console logging
     console = logging.StreamHandler()
     console.setLevel(logging.DEBUG if args.verbose else logging.INFO)
@@ -478,13 +478,13 @@ if __name__ == '__main__':
     tx_fileh.setFormatter(tx_formatter)
     tx_logger.addHandler(tx_fileh)
     tx_logger.propagate = False
-    
+
     #xnova(7/16/2014): Disable for now, as this uses requests under the surface, which may not be safe for a gevent-based app
     #rollbar integration
     #if config.ROLLBAR_TOKEN:
     #    logging.info("Rollbar support enabled. Logging for environment: %s" % config.ROLLBAR_ENV)
     #    rollbar.init(config.ROLLBAR_TOKEN, config.ROLLBAR_ENV, allow_logging_basic_config=False)
-    #    
+    #
     #    def report_errors(ex_cls, ex, tb):
     #        rollbar.report_exc_info((ex_cls, ex, tb))
     #        raise ex #re-raise
@@ -568,7 +568,7 @@ if __name__ == '__main__':
         ("when", pymongo.ASCENDING),
         ("network", pymongo.ASCENDING),
     ])
-    
+
     ##COLLECTIONS THAT ARE *NOT* PURGED AS A RESULT OF A REPARSE
     #preferences
     mongo_db.preferences.ensure_index('wallet_id', unique=True)
@@ -605,7 +605,7 @@ if __name__ == '__main__':
         redis_client = redis.StrictRedis(host=config.REDIS_CONNECT, port=config.REDIS_PORT, db=config.REDIS_DATABASE)
     else:
         redis_client = None
-    
+
     #set up zeromq publisher for sending out received events to connected socket.io clients
     zmq_context = zmq.Context()
     zmq_publisher_eventfeed = zmq_context.socket(zmq.PUB)
@@ -625,7 +625,7 @@ if __name__ == '__main__':
         resource="socket.io", policy_server=False)
     sio_server.start() #start the socket.io server greenlets
 
-    logging.info("Starting up counterpartyd block feed poller...")
+    logging.info("Starting up clearinghoused block feed poller...")
     gevent.spawn(blockfeed.process_cpd_blockfeed, zmq_publisher_eventfeed)
 
     #start up event timers that don't depend on the feed being fully caught up
@@ -640,10 +640,10 @@ if __name__ == '__main__':
 
     logging.info("Starting up RPC API handler...")
     api.serve_api(mongo_db, redis_client)
-    
+
     #print some user friendly startup warnings as need be
     if not config.SUPPORT_EMAIL:
-        logging.warn("Support email setting not set: To enable, please specify an email for the 'support-email' setting in your counterblockd.conf")
+        logging.warn("Support email setting not set: To enable, please specify an email for the 'support-email' setting in your clearblockd.conf")
 
 
 # vim: tabstop=8 expandtab shiftwidth=4 softtabstop=4
