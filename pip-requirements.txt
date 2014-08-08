@@ -21,7 +21,7 @@ pytest==2.5.1
 #############
 #counterblockd specific deps
 
-pycoin==0.42
+pycoin==0.50
 
 pymongo==2.7.1
 
