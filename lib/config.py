@@ -23,7 +23,7 @@ mongo_db = None #will be set on server init
 BTC = 'VIA'
 XCP = 'XCH'
 
-MAX_REORG_NUM_BLOCKS = 10 #max reorg we'd likely ever see
+MAX_REORG_NUM_BLOCKS = 15 #max reorg we'd likely ever see
 
 ARMORY_UTXSVR_PORT_MAINNET = 6590
 ARMORY_UTXSVR_PORT_TESTNET = 6591

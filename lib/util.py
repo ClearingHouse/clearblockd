@@ -112,7 +112,7 @@ def call_jsonrpc_api(method, params=None, endpoint=None, auth=None, abort_on_err
         raise Exception("Got call_jsonrpc_api request error: %s" % e)
     else:
         if r.status_code != 200 and abort_on_error:
-            raise Exception("Bad status code returned from counterpartyd: '%s'. result body: '%s'." % (r.status_code, r.read()))
+            raise Exception("Bad status code returned from clearinghoused: '%s'. result body: '%s'." % (r.status_code, r.read()))
         result = json.loads(r.read())
     finally:
         client.close()

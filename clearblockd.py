@@ -112,16 +112,16 @@ if __name__ == '__main__':
     # THINGS WE CONNECT TO
 
     # counterpartyd RPC host
-    if args.counterpartyd_rpc_connect:
-        config.COUNTERPARTYD_RPC_CONNECT = args.counterpartyd_rpc_connect
+    if args.clearinghoused_rpc_connect:
+        config.COUNTERPARTYD_RPC_CONNECT = args.clearinghoused_rpc_connect
     elif has_config and configfile.has_option('Default', 'clearinghoused-rpc-connect') and configfile.get('Default', 'clearinghoused-rpc-connect'):
         config.COUNTERPARTYD_RPC_CONNECT = configfile.get('Default', 'clearinghoused-rpc-connect')
     else:
         config.COUNTERPARTYD_RPC_CONNECT = 'localhost'
 
     # counterpartyd RPC port
-    if args.counterpartyd_rpc_port:
-        config.COUNTERPARTYD_RPC_PORT = args.counterpartyd_rpc_port
+    if args.clearinghoused_rpc_port:
+        config.COUNTERPARTYD_RPC_PORT = args.clearinghoused_rpc_port
     elif has_config and configfile.has_option('Default', 'clearinghoused-rpc-port') and configfile.get('Default', 'clearinghoused-rpc-port'):
         config.COUNTERPARTYD_RPC_PORT = configfile.get('Default', 'clearinghoused-rpc-port')
     else:
@@ -136,16 +136,16 @@ if __name__ == '__main__':
         raise Exception("Please specific a valid port number clearinghoused-rpc-port configuration parameter")
 
     # counterpartyd RPC user
-    if args.counterpartyd_rpc_user:
-        config.COUNTERPARTYD_RPC_USER = args.counterpartyd_rpc_user
+    if args.clearinghoused_rpc_user:
+        config.COUNTERPARTYD_RPC_USER = args.clearinghoused_rpc_user
     elif has_config and configfile.has_option('Default', 'clearinghoused-rpc-user') and configfile.get('Default', 'clearinghoused-rpc-user'):
         config.COUNTERPARTYD_RPC_USER = configfile.get('Default', 'clearinghoused-rpc-user')
     else:
         config.COUNTERPARTYD_RPC_USER = 'rpcuser'
 
     # counterpartyd RPC password
-    if args.counterpartyd_rpc_password:
-        config.COUNTERPARTYD_RPC_PASSWORD = args.counterpartyd_rpc_password
+    if args.clearinghoused_rpc_password:
+        config.COUNTERPARTYD_RPC_PASSWORD = args.clearinghoused_rpc_password
     elif has_config and configfile.has_option('Default', 'clearinghoused-rpc-password') and configfile.get('Default', 'clearinghoused-rpc-password'):
         config.COUNTERPARTYD_RPC_PASSWORD = configfile.get('Default', 'clearinghoused-rpc-password')
     else:
@@ -362,9 +362,9 @@ if __name__ == '__main__':
 
     #More testnet
     if config.TESTNET:
-        config.BLOCK_FIRST = 154908
+        config.BLOCK_FIRST = 50000
     else:
-        config.BLOCK_FIRST = 278270
+        config.BLOCK_FIRST = 88525
 
     # Log
     if args.log_file:

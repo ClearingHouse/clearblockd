@@ -1325,7 +1325,7 @@ def serve_api(mongo_db, redis_client):
         return True
     
     @dispatcher.add_method
-    def proxy_to_counterpartyd(method='', params=[]):
+    def proxy_to_clearinghoused(method='', params=[]):
         if method=='sql': raise Exception("Invalid method") 
         result = None
         cache_key = None

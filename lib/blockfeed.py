@@ -43,9 +43,9 @@ def process_cpd_blockfeed(zmq_publisher_eventfeed):
         mongo_db.app_config.update({}, {
         'db_version': config.DB_VERSION, #counterblockd database version
         'running_testnet': config.TESTNET,
-        'counterpartyd_db_version_major': None,
-        'counterpartyd_db_version_minor': None,
-        'counterpartyd_running_testnet': None,
+        'clearinghoused_db_version_major': None,
+        'clearinghoused_db_version_minor': None,
+        'clearinghoused_running_testnet': None,
         'last_block_assets_compiled': config.BLOCK_FIRST, #for asset data compilation in events.py (resets on reparse as well)
         }, upsert=True)
         app_config = mongo_db.app_config.find()[0]
@@ -76,7 +76,7 @@ def process_cpd_blockfeed(zmq_publisher_eventfeed):
            and we should get rid of them
         
         NOTE: after calling this function, you should always trigger a "continue" statement to reiterate the processing loop
-        (which will get a new last_processed_block from counterpartyd and resume as appropriate)   
+        (which will get a new last_processed_block from clearinghoused and resume as appropriate)
         """
         logging.warn("Pruning to block %i ..." % (max_block_index))        
         mongo_db.processed_blocks.remove({"block_index": {"$gt": max_block_index}})
@@ -180,7 +180,7 @@ def process_cpd_blockfeed(zmq_publisher_eventfeed):
         # or errored out while processing a block)
         my_latest_block = prune_my_stale_blocks(my_latest_block['block_index'])
 
-    #start polling counterpartyd for new blocks    
+    #start polling clearinghoused for new blocks
     while True:
         try:
             running_info = util.call_jsonrpc_api("get_running_info", abort_on_error=True)
@@ -192,47 +192,47 @@ def process_cpd_blockfeed(zmq_publisher_eventfeed):
             time.sleep(3)
             continue
         
-        if running_info['last_message_index'] == -1: #last_message_index not set yet (due to no messages in counterpartyd DB yet)
+        if running_info['last_message_index'] == -1: #last_message_index not set yet (due to no messages in clearinghoused DB yet)
             logging.warn("No last_message_index returned. Waiting until clearinghoused has messages...")
             time.sleep(10)
             continue
         
-        #wipe our state data if necessary, if counterpartyd has moved on to a new DB version
+        #wipe our state data if necessary, if clearinghoused has moved on to a new DB version
         wipeState = False
         updatePrefs = False
-        if    app_config['counterpartyd_db_version_major'] is None \
-           or app_config['counterpartyd_db_version_minor'] is None \
-           or app_config['counterpartyd_running_testnet'] is None:
+        if    app_config['clearinghoused_db_version_major'] is None \
+           or app_config['clearinghoused_db_version_minor'] is None \
+           or app_config['clearinghoused_running_testnet'] is None:
             updatePrefs = True
-        elif running_info['version_major'] != app_config['counterpartyd_db_version_major']:
+        elif running_info['version_major'] != app_config['clearinghoused_db_version_major']:
             logging.warn("clearinghoused MAJOR DB version change (we built from %s, clearinghoused is at %s). Wiping our state data." % (
-                app_config['counterpartyd_db_version_major'], running_info['version_major']))
+                app_config['clearinghoused_db_version_major'], running_info['version_major']))
             wipeState = True
             updatePrefs = True
-        elif running_info['version_minor'] != app_config['counterpartyd_db_version_minor']:
+        elif running_info['version_minor'] != app_config['clearinghoused_db_version_minor']:
             logging.warn("clearinghoused MINOR DB version change (we built from %s.%s, clearinghoused is at %s.%s). Wiping our state data." % (
-                app_config['counterpartyd_db_version_major'], app_config['counterpartyd_db_version_minor'],
+                app_config['clearinghoused_db_version_major'], app_config['clearinghoused_db_version_minor'],
                 running_info['version_major'], running_info['version_minor']))
             wipeState = True
             updatePrefs = True
-        elif running_info.get('running_testnet', False) != app_config['counterpartyd_running_testnet']:
+        elif running_info.get('running_testnet', False) != app_config['clearinghoused_running_testnet']:
             logging.warn("clearinghoused testnet setting change (from %s to %s). Wiping our state data." % (
-                app_config['counterpartyd_running_testnet'], running_info['running_testnet']))
+                app_config['clearinghoused_running_testnet'], running_info['running_testnet']))
             wipeState = True
             updatePrefs = True
         if wipeState:
             app_config = blow_away_db()
         if updatePrefs:
-            app_config['counterpartyd_db_version_major'] = running_info['version_major'] 
-            app_config['counterpartyd_db_version_minor'] = running_info['version_minor']
-            app_config['counterpartyd_running_testnet'] = running_info['running_testnet']
+            app_config['clearinghoused_db_version_major'] = running_info['version_major']
+            app_config['clearinghoused_db_version_minor'] = running_info['version_minor']
+            app_config['clearinghoused_running_testnet'] = running_info['running_testnet']
             mongo_db.app_config.update({}, app_config)
             
             #reset my latest block record
             my_latest_block = LATEST_BLOCK_INIT
             config.CAUGHT_UP = False #You've Come a Long Way, Baby
         
-        #work up to what block counterpartyd is at
+        #work up to what block clearinghoused is at
         last_processed_block = running_info['last_block']
         
         if last_processed_block['block_index'] is None:
@@ -273,7 +273,7 @@ def process_cpd_blockfeed(zmq_publisher_eventfeed):
                         config.LAST_MESSAGE_INDEX + 1, msg['message_index'], msg, [m['message_index'] for m in block_data]))
                     #sys.exit(1) #FOR NOW
                 
-                #BUG: sometimes counterpartyd seems to return OLD messages out of the message feed. deal with those
+                #BUG: sometimes clearinghoused seems to return OLD messages out of the message feed. deal with those
                 if msg['message_index'] <= config.LAST_MESSAGE_INDEX:
                     logging.warn("BUG: IGNORED old RAW message %s: %s ..." % (msg['message_index'], msg))
                     continue
@@ -310,7 +310,7 @@ def process_cpd_blockfeed(zmq_publisher_eventfeed):
                     my_latest_block = prune_my_stale_blocks(msg_data['block_index'] - 1)
                     config.CURRENT_BLOCK_INDEX = msg_data['block_index'] - 1
 
-                    #for the current last_message_index (which could have gone down after the reorg), query counterpartyd
+                    #for the current last_message_index (which could have gone down after the reorg), query clearinghoused
                     running_info = util.call_jsonrpc_api("get_running_info", abort_on_error=True)['result']
                     config.LAST_MESSAGE_INDEX = running_info['last_message_index']
                     
@@ -463,13 +463,13 @@ def process_cpd_blockfeed(zmq_publisher_eventfeed):
             clean_mempool_tx()
 
         elif my_latest_block['block_index'] > last_processed_block['block_index']:
-            #we have stale blocks (i.e. most likely a reorg happened in counterpartyd)?? this shouldn't happen, as we
+            #we have stale blocks (i.e. most likely a reorg happened in clearinghoused)?? this shouldn't happen, as we
             # should get a reorg message. Just to be on the safe side, prune back MAX_REORG_NUM_BLOCKS blocks
-            # before what counterpartyd is saying if we see this
-            logging.error("Very odd: Ahead of counterpartyd with block indexes! Pruning back %s blocks to be safe." % config.MAX_REORG_NUM_BLOCKS)
+            # before what clearinghoused is saying if we see this
+            logging.error("Very odd: Ahead of clearinghoused with block indexes! Pruning back %s blocks to be safe." % config.MAX_REORG_NUM_BLOCKS)
             my_latest_block = prune_my_stale_blocks(last_processed_block['block_index'] - config.MAX_REORG_NUM_BLOCKS)
         else:
-            #...we may be caught up (to counterpartyd), but counterpartyd may not be (to the blockchain). And if it isn't, we aren't
+            #...we may be caught up (to clearinghoused), but clearinghoused may not be (to the blockchain). And if it isn't, we aren't
             config.CAUGHT_UP = running_info['db_caught_up']
             
             #this logic here will cover a case where we shut down counterblockd, then start it up again quickly...
