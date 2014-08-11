@@ -28,7 +28,7 @@ def denormalize_quantity(quantity, divisible=True):
     else: return quantity
 
 
-get_btc_supply(normalize=False, at_block_index=None):
+def get_btc_supply(normalize=False, at_block_index=None):
     """returns the total supply of VIA (based on what Viacoin Core says the current block height is)"""
     block_height = config.CURRENT_BLOCK_INDEX if at_block_index is None else at_block_index
     total_supply = 0
