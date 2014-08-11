@@ -27,21 +27,43 @@ def denormalize_quantity(quantity, divisible=True):
         return int(quantity * config.UNIT)
     else: return quantity
 
-def get_btc_supply(normalize=False, at_block_index=None):
-    """returns the total supply of BTC (based on what bitcoind says the current block height is)"""
-    block_count = config.CURRENT_BLOCK_INDEX if at_block_index is None else at_block_index
-    blocks_remaining = block_count
-    total_supply = 0 
-    reward = 50.0
-    while blocks_remaining > 0:
-        if blocks_remaining >= 210000:
-            blocks_remaining -= 210000
-            total_supply += 210000 * reward
-            reward /= 2
-        else:
-            total_supply += (blocks_remaining * reward)
-            blocks_remaining = 0
-            
+
+
+get_btc_supply(normalize=False, at_block_index=None):
+    """returns the total supply of VIA (based on what Viacoin Core says the current block height is)"""
+    block_height = config.CURRENT_BLOCK_INDEX if at_block_index is None else at_block_index
+    total_supply = 0
+
+    offset = 0
+    if config.TESTNET:
+        offset = 8000
+
+    max_blocks = 31536000
+
+    range_list = (
+        (26280001,        31536000,         0.5),
+        (21024001,        26280000,         1 ),
+        (15768001,        21024000,         2 ),
+        (10512001,        15768000,         3 ),
+        ( 5256001,        10512000,         4 ),
+        (   42402-offset,  5256000,         5 ),
+        (   31602-offset,    42401-offset,  6 ),
+        (   20802-offset,    31601-offset,  7 ),
+        (   10002-offset,    20801-offset, 10 ),
+        (       2,           10001-off:et,  0 ),
+        (       1,               1,  10000000 ),
+        (       0,               0,         0 )
+    )
+
+    if block_height >= max_blocks:
+        block_height = max_blocks
+
+    for (start, end, reward) in range_list:
+        if start <= block_height <= end:
+            range_size = block_height - start + 1
+            total_supply += reward * range_size
+            block_height -= range_size
+
     return total_supply if normalize else int(total_supply * config.UNIT)
 
 def pubkey_to_address(pubkey_hex):
