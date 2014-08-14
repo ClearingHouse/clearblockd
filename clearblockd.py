@@ -323,9 +323,9 @@ if __name__ == '__main__':
         config.SOCKETIO_PORT = configfile.get('Default', 'socketio-port')
     else:
         if config.TESTNET:
-            config.SOCKETIO_PORT = 14101
+            config.SOCKETIO_PORT = 17311
         else:
-            config.SOCKETIO_PORT = 4101
+            config.SOCKETIO_PORT = 7311
     try:
         config.SOCKETIO_PORT = int(config.SOCKETIO_PORT)
         assert int(config.SOCKETIO_PORT) > 1 and int(config.SOCKETIO_PORT) < 65535
@@ -347,9 +347,9 @@ if __name__ == '__main__':
         config.SOCKETIO_CHAT_PORT = configfile.get('Default', 'socketio-chat-port')
     else:
         if config.TESTNET:
-            config.SOCKETIO_CHAT_PORT = 14102
+            config.SOCKETIO_CHAT_PORT = 17312
         else:
-            config.SOCKETIO_CHAT_PORT = 4102
+            config.SOCKETIO_CHAT_PORT = 7312
     try:
         config.SOCKETIO_CHAT_PORT = int(config.SOCKETIO_CHAT_PORT)
         assert int(config.SOCKETIO_CHAT_PORT) > 1 and int(config.SOCKETIO_CHAT_PORT) < 65535
