@@ -126,9 +126,9 @@ if __name__ == '__main__':
         config.COUNTERPARTYD_RPC_PORT = configfile.get('Default', 'clearinghoused-rpc-port')
     else:
         if config.TESTNET:
-            config.COUNTERPARTYD_RPC_PORT = 14000
+            config.COUNTERPARTYD_RPC_PORT = 17300
         else:
-            config.COUNTERPARTYD_RPC_PORT = 4000
+            config.COUNTERPARTYD_RPC_PORT = 7300
     try:
         config.COUNTERPARTYD_RPC_PORT = int(config.COUNTERPARTYD_RPC_PORT)
         assert int(config.COUNTERPARTYD_RPC_PORT) > 1 and int(config.COUNTERPARTYD_RPC_PORT) < 65535
@@ -291,9 +291,9 @@ if __name__ == '__main__':
         config.RPC_PORT = configfile.get('Default', 'rpc-port')
     else:
         if config.TESTNET:
-            config.RPC_PORT = 14100
+            config.RPC_PORT = 17310
         else:
-            config.RPC_PORT = 4100
+            config.RPC_PORT = 7310
     try:
         config.RPC_PORT = int(config.RPC_PORT)
         assert int(config.RPC_PORT) > 1 and int(config.RPC_PORT) < 65535
