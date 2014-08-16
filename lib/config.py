@@ -27,3 +27,6 @@ MAX_REORG_NUM_BLOCKS = 15 #max reorg we'd likely ever see
 
 ARMORY_UTXSVR_PORT_MAINNET = 6590
 ARMORY_UTXSVR_PORT_TESTNET = 6591
+
+QUOTE_ASSETS = ['VIA', 'XVIA', 'XCH'] # define the priority for quote asset
+MARKET_LIST_QUOTE_ASSETS = ['XCH', 'XVIA', 'VIA'] # define the order in the market list
