@@ -189,6 +189,8 @@ def json_dthandler(obj):
     if hasattr(obj, 'timetuple'): #datetime object
         #give datetime objects to javascript as epoch ts in ms (i.e. * 1000)
         return int(time.mktime(obj.timetuple())) * 1000
+    elif isinstance(obj, decimal.Decimal):
+        return float(obj)
     else:
         raise TypeError, 'Object of type %s with value of %s is not JSON serializable' % (type(obj), repr(obj))
 

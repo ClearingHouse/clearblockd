@@ -8,6 +8,7 @@ blockchain-service-connect=http://RPC_USER:RPC_PASSWORD@RPC_HOST:RPC_PORT
 import decimal
 import json
 import re
+import time
 from lib import config, util, util_bitcoin
 from geventhttpclient import HTTPClient
 from geventhttpclient.url import URL
@@ -132,7 +133,7 @@ def listunspent(address):
                 rv.append({'address': address,
                            'txid': txid,
                            'vout': vout['n'],
-                           'ts': txs[txid]['time'],
+                           'ts': txs[txid]['time'] if 'time' in txs[txid] else int(time.time()),
                            'scriptPubKey': vout['scriptPubKey']['hex'],
                            'amount': vout['value'],
                            'confirmations': txs[txid]['confirmations']})
