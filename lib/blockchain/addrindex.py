@@ -145,7 +145,6 @@ def getaddressinfo(address):
         unconfirmedBalance = decimal.Decimal(0.0)
         unconfirmedTxApperances = 0
         txApperances = 0
-        txset = set()
 
         mempool = getmempool()
         mptxs = {tx['txid']: tx for tx in mempool}
@@ -165,8 +164,6 @@ def getaddressinfo(address):
                     vout = locate_vout(mptxs_own_vouts[vin['txid']], vin['vout'])
                     if ismine(vout, address):
                         mptxs_own_vins[mptx] = mptxs[mptx]
-                        break
-                    else:
                         break
                 elif vin['txid'] in txs:
                     for vout in txs[vin['txid']]['vout']:
@@ -199,7 +196,6 @@ def getaddressinfo(address):
             if tx['confirmations']:
                 txApperances += 1
             else:
-                print(txid)
                 unconfirmedTxApperances += 1
         balance = totalReceived - totalSent
         return {'addrStr': address,
