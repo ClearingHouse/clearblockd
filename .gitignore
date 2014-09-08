@@ -36,6 +36,5 @@ nosetests.xml
 # tests
 schema.py
 
-# MACOS Files
-.DS_Store
-._.*
+#Docs 
+docs/_build
