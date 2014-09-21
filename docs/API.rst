@@ -225,7 +225,7 @@ Asset Functions
 
 .. function:: get_normalized_balances(addresses)
 
-  This call augments counterpartyd's get_balances with a normalized_quantity field. It also will include any owned assets for an address, even if their balance is zero. NOTE: Does not retrieve BTC balance. Use get_address_info for that.
+  This call augments clearinghoused's get_balances with a normalized_quantity field. It also will include any owned assets for an address, even if their balance is zero. NOTE: Does not retrieve BTC balance. Use get_address_info for that.
 
   :param list addresses: List of addresses to check
   :return: List
@@ -234,7 +234,7 @@ Asset Functions
 .. function:: get_order_book_buysell(buy_asset, sell_asset, pct_fee_provided=None, pct_fee_required=None)
 
    .. deprecated:: 1.5
-      Use counterpartyd's `get_orders`
+      Use clearinghoused's `get_orders`
 
 
    :param buy_asset: Asset
@@ -275,7 +275,7 @@ Asset Functions
 .. function:: get_order_book_simple(asset1, asset2, min_pct_fee_provided=None, max_pct_fee_required=None)
 
     .. deprecated:: 1.5
-      Use counterpartyd's `get_orders`
+      Use clearinghoused's `get_orders`
 
     Easier to call version when you want all orders involving the two assets.
 
@@ -520,7 +520,7 @@ Message Functions
 
 .. function:: get_messagefeed_messages_by_index(message_indexes)
 
-  Alias for counterpartyd get_messages_by_index
+  Alias for clearinghoused get_messages_by_index
 
   :param list message_indexs: Message IDs to fetch
   :return: A list of messages
@@ -626,13 +626,13 @@ Action/Write API Function Reference
     .. deprecated:: 1.5
 
 
-.. function:: proxy_to_counterpartyd(method='', params={})
+.. function:: proxy_to_clearinghoused(method='', params={})
 
-  :param method: Method name to call in counterpartyd.
+  :param method: Method name to call in clearinghoused.
   :param params: Array of function parameters.
-  :returns: The method response from counterpartyd
+  :returns: The method response from clearinghoused
 
-  Relays a request to the counterpartyd server, with the given method and params, and returns the result. See the `counterpartyd API documentation <http://counterpartyd.readthedocs.org/en/latest/API.html>`_ for available methods.
+  Relays a request to the clearinghoused server, with the given method and params, and returns the result. See the `clearinghoused API documentation <http://clearinghoused.readthedocs.org/en/latest/API.html>`_ for available methods.
 
 .. function:: record_btc_open_order(wallet_id, order_tx_hash)
 
@@ -676,7 +676,7 @@ An object that stores the Clearwallet preferences for the given wallet ID.
 API Changes
 -------------
 
-This section documents any changes to the ``counterblockd`` API, for version numbers where there were API-level modifications.
+This section documents any changes to the ``clearblockd`` API, for version numbers where there were API-level modifications.
 
 1.5
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
