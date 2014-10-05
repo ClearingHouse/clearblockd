@@ -10,7 +10,7 @@ D = decimal.Decimal
 
 def get_document_for_hash(hash_string = '', hash_type = 0):
     if hash:
-        sql = 'SELECT * FROM documents WHERE hash_string = ? and hash_type = ?'
+        sql = 'SELECT * FROM documents WHERE hash_string = ? and hash_type = ? COLLATE NOCASE'
         params = {
                 'query': sql,
                 'bindings': (hash_string, hash_type)
