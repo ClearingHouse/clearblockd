@@ -24,6 +24,7 @@ BTC = 'VIA'
 XCP = 'XCH'
 
 MAX_REORG_NUM_BLOCKS = 15 #max reorg we'd likely ever see
+MAX_FORCED_REORG_NUM_BLOCKS = 50 #but let us go deeper when messages are out of sync
 
 ARMORY_UTXSVR_PORT_MAINNET = 6590
 ARMORY_UTXSVR_PORT_TESTNET = 6591
