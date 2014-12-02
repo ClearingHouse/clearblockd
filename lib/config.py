@@ -31,3 +31,6 @@ ARMORY_UTXSVR_PORT_TESTNET = 6591
 
 QUOTE_ASSETS = ['VIA', 'XVIA', 'XCH'] # define the priority for quote asset
 MARKET_LIST_QUOTE_ASSETS = ['XCH', 'XVIA', 'VIA'] # define the order in the market list
+
+DEFAULT_BACKEND_RPC_PORT_TESTNET = 25222
+DEFAULT_BACKEND_RPC_PORT = 5222

@@ -184,11 +184,11 @@ def process_cpd_blockfeed(zmq_publisher_eventfeed):
         my_latest_block = prune_my_stale_blocks(my_latest_block['block_index'])
 
 
-    #avoid contacting clearinghoused (on reparse, to speed up)
+    #avoid contacting counterpartyd (on reparse, to speed up)
     autopilot = False
     autopilot_runner = 0
 
-    #start polling clearinghoused for new blocks
+    #start polling counterpartyd for new blocks
     while True:
         if not autopilot or autopilot_runner == 0:
             try:
@@ -289,7 +289,7 @@ def process_cpd_blockfeed(zmq_publisher_eventfeed):
                     break
                     #sys.exit(1) #FOR NOW
                 
-                #BUG: sometimes clearinghoused seems to return OLD messages out of the message feed. deal with those
+                #BUG: sometimes counterpartyd seems to return OLD messages out of the message feed. deal with those
                 #TODO unreachable now, delete?
                 if msg['message_index'] <= config.LAST_MESSAGE_INDEX:
                     logging.warn("BUG: IGNORED old RAW message %s: %s ..." % (msg['message_index'], msg))
@@ -327,7 +327,7 @@ def process_cpd_blockfeed(zmq_publisher_eventfeed):
                     my_latest_block = prune_my_stale_blocks(msg_data['block_index'] - 1)
                     config.CURRENT_BLOCK_INDEX = msg_data['block_index'] - 1
 
-                    #for the current last_message_index (which could have gone down after the reorg), query clearinghoused
+                    #for the current last_message_index (which could have gone down after the reorg), query counterpartyd
                     running_info = util.call_jsonrpc_api("get_running_info", abort_on_error=True)['result']
                     config.LAST_MESSAGE_INDEX = running_info['last_message_index']
                     
@@ -350,6 +350,7 @@ def process_cpd_blockfeed(zmq_publisher_eventfeed):
                     asset_info = mongo_db.tracked_assets.find_one({ 'asset': msg_data['asset'] })
                     if asset_info is None:
                         logging.warn("Credit/debit of %s where asset ('%s') does not exist. Ignoring..." % (msg_data['quantity'], msg_data['asset']))
+                        config.LAST_MESSAGE_INDEX = msg['message_index']
                         continue
                     quantity = msg_data['quantity'] if msg['category'] == 'credits' else -msg_data['quantity']
                     quantity_normalized = util_bitcoin.normalize_quantity(quantity, asset_info['divisible'])
@@ -411,6 +412,7 @@ def process_cpd_blockfeed(zmq_publisher_eventfeed):
                     if    (order_match['forward_asset'] == config.BTC and order_match['forward_quantity'] <= config.ORDER_BTC_DUST_LIMIT_CUTOFF) \
                        or (order_match['backward_asset'] == config.BTC and order_match['backward_quantity'] <= config.ORDER_BTC_DUST_LIMIT_CUTOFF):
                         logging.debug("Order match %s ignored due to %s under dust limit." % (order_match['tx0_hash'] + order_match['tx1_hash'], config.BTC))
+                        config.LAST_MESSAGE_INDEX = msg['message_index']
                         continue
 
                     #take divisible trade quantities to floating point
@@ -493,13 +495,13 @@ def process_cpd_blockfeed(zmq_publisher_eventfeed):
                     clean_mempool_tx()
 
         elif my_latest_block['block_index'] > last_processed_block['block_index']:
-            #we have stale blocks (i.e. most likely a reorg happened in clearinghoused)?? this shouldn't happen, as we
+            #we have stale blocks (i.e. most likely a reorg happened in counterpartyd)?? this shouldn't happen, as we
             # should get a reorg message. Just to be on the safe side, prune back MAX_REORG_NUM_BLOCKS blocks
-            # before what clearinghoused is saying if we see this
+            # before what counterpartyd is saying if we see this
             logging.error("Very odd: Ahead of clearinghoused with block indexes! Pruning back %s blocks to be safe." % config.MAX_REORG_NUM_BLOCKS)
             my_latest_block = prune_my_stale_blocks(last_processed_block['block_index'] - config.MAX_REORG_NUM_BLOCKS)
         else:
-            #...we may be caught up (to clearinghoused), but clearinghoused may not be (to the blockchain). And if it isn't, we aren't
+            #...we may be caught up (to counterpartyd), but counterpartyd may not be (to the blockchain). And if it isn't, we aren't
             config.CAUGHT_UP = running_info['db_caught_up']
             
             #this logic here will cover a case where we shut down counterblockd, then start it up again quickly...
