@@ -56,8 +56,10 @@ if __name__ == '__main__':
     parser.add_argument('--clearinghoused-rpc-user', help='the username used to communicate with clearinghoused over JSON-RPC')
     parser.add_argument('--clearinghoused-rpc-password', help='the password used to communicate with clearinghoused over JSON-RPC')
 
+    # begin viacoin
     parser.add_argument('--blockchain-service-name', help='the blockchain service name to connect to')
     parser.add_argument('--blockchain-service-connect', help='the blockchain service server URL base to connect to, if not default')
+    # end viacoin
 
     parser.add_argument('--mongodb-connect', help='the hostname of the mongodb server to connect to')
     parser.add_argument('--mongodb-port', type=int, help='the port used to communicate with mongodb')
