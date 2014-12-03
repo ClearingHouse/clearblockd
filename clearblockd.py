@@ -122,7 +122,7 @@ if __name__ == '__main__':
     # THINGS WE CONNECT TO
 
     # backend (e.g. bitcoind) RPC host
-    if args.counterpartyd_rpc_connect:
+    if args.clearinghoused_rpc_connect:
         config.BACKEND_RPC_CONNECT = args.backend_rpc_connect
     elif has_config and configfile.has_option('Default', 'backend-rpc-connect') and configfile.get('Default', 'backend-rpc-connect'):
         config.BACKEND_RPC_CONNECT = configfile.get('Default', 'backend-rpc-connect')
